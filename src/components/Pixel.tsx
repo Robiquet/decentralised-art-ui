@@ -6,20 +6,19 @@ interface StyledPixelProps {
 
 const StyledPixel = styled.div.attrs<StyledPixelProps>((props) => ({
   style: {
-    background: props.backgroundColour,
+    background: props.backgroundColour, 
   },
 }))<StyledPixelProps>`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100px;
-  height: 100px;
+  width: 50px;
+  height: 50px;
   flex-shrink: 0;
-  border: white 1px solid;
 `;
 
 const Pixel = (props: { colour: string }) => {
-  return <StyledPixel backgroundColour={props.colour}></StyledPixel>;
+  return <StyledPixel backgroundColour={props.colour === '' ? 'black' : props.colour}></StyledPixel>;
 };
 
 export default Pixel;

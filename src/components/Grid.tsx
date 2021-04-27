@@ -2,8 +2,8 @@ import Pixel from "./Pixel";
 import styled from "styled-components";
 import { useEffect, useState } from "react";
 
-const COLS = 5;
-const ROWS = 5;
+const COLS = 50;
+const ROWS = 50;
 
 const Row = styled.div`
   display: flex;
@@ -26,13 +26,17 @@ const Grid = () => {
           return Array(COLS)
             .fill(0)
             .map(() => {
-              const colour = generateRandomColour();
-              return colour;
+              return shouldAssignColour() ? generateRandomColour() : ''
             });
         });
       setColours(coloursGrid);
-    }, 500);
+    }, 1000);
   }, []);
+
+  const shouldAssignColour =() => {
+    const randomNumber = Math.floor(Math.random() * 10)
+    return randomNumber === 5
+  }
 
   const generateRandomColour = () => {
     var randomColor = "#" + Math.floor(Math.random() * 16777215).toString(16);
