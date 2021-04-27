@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import styled from "styled-components";
 
 // interface StyledPixelProps {
@@ -26,23 +25,10 @@ const StyledPixel = styled.div`
 } */
 `;
 
-const Pixel = () => {
-  const [colour, setColour] = useState("black");
+const Pixel = (props: {colour:string}) => {
 
-  useEffect(() => {
-    setInterval(() => {
-      const colour = generateRandomColour();
-      console.log(colour);
-      setColour(colour);
-    }, 5000);
-  }, []);
 
-  const generateRandomColour = () => {
-    var randomColor = "#" + Math.floor(Math.random() * 16777215).toString(16);
-    return randomColor;
-  };
-
-  return <StyledPixel backgroundColour={colour}></StyledPixel>;
+  return <StyledPixel backgroundColour={props.colour}></StyledPixel>;
 };
 
 export default Pixel;
