@@ -1,8 +1,8 @@
 import Pixel from "./Pixel";
 import styled from "styled-components";
 
-const COLS = 20;
-const ROWS = 20;
+const COLS = 5;
+const ROWS = 5;
 
 const Row = styled.div`
   display: flex;
