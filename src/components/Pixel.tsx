@@ -2,23 +2,25 @@ import styled from "styled-components";
 
 interface StyledPixelProps {
   backgroundColour: string;
+  pixelSize: number;
 }
 
 const StyledPixel = styled.div.attrs<StyledPixelProps>((props) => ({
   style: {
     background: props.backgroundColour, 
+    width: props.pixelSize,
+    height: props.pixelSize
   },
 }))<StyledPixelProps>`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 50px;
-  height: 50px;
+
   flex-shrink: 0;
 `;
 
-const Pixel = (props: { colour: string }) => {
-  return <StyledPixel backgroundColour={props.colour === '' ? 'black' : props.colour}></StyledPixel>;
+const Pixel = (props: { colour: string; pixelSize:number }) => {
+  return <StyledPixel backgroundColour={props.colour === '' ? 'black' : props.colour} pixelSize={props.pixelSize}></StyledPixel>;
 };
 
 export default Pixel;
