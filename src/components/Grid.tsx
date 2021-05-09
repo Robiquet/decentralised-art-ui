@@ -1,6 +1,7 @@
 import Pixel from "./Pixel";
 import styled from "styled-components";
 import { useEffect, useState } from "react";
+import ConnectWallet from "./ConnectWallet";
 
 const COLS = 40;
 const ROWS = 40;
@@ -38,9 +39,9 @@ const Grid = () => {
     const ref = setInterval(() => {
       const coloursGrid: string[][] = generateGrid();
       setColours(coloursGrid);
-    }, 1000);
+    }, 10000);
     setIntervalRef(ref);
-    
+
     stopPreview(); // should be called when user connects wallet
   }, []);
 
@@ -85,9 +86,12 @@ const Grid = () => {
   ));
 
   return (
-    <Container height={GRID_HEIGHT} width={GRID_WIDTH}>
-      {numbers}
-    </Container>
+    <>
+    <ConnectWallet></ConnectWallet>
+      <Container height={GRID_HEIGHT} width={GRID_WIDTH}>
+        {numbers}
+      </Container>
+    </>
   );
 };
 
