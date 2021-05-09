@@ -13,7 +13,7 @@ const Row = styled.div`
 `;
 
 interface ContainerProps {
-  height: number;
+       height: number;
   width: number;
 }
 
