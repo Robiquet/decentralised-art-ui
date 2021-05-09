@@ -12,13 +12,14 @@ const Content = styled.div`
   margin-bottom: 20px;
 `;
 
-const ConnectWallet = () => {
+const ConnectWallet = ({ onConnect }: { onConnect: () => void }) => {
   const [open, setOpen] = useState(true);
 
   const handleConnect = async () => {
     try {
       await window.ethereum.request({ method: "eth_requestAccounts" });
       setOpen(false);
+      onConnect()
     } catch (e) {
       console.error("Error connecting wallet", e);
     }

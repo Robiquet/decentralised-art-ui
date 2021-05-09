@@ -48,6 +48,7 @@ const Grid = () => {
   const stopPreview = () => {
     if (intervalRef) {
       clearInterval(intervalRef);
+      setColours(generateEmptyGrid());
     }
   };
 
@@ -62,6 +63,22 @@ const Grid = () => {
           });
       });
   };
+
+  const generateEmptyGrid = () => {
+    return Array(ROWS)
+      .fill(0)
+      .map(() => {
+        return Array(COLS)
+          .fill(0)
+          .map(() => {
+            return "";
+          });
+      });
+  }
+
+  const handleConnect=()=> {
+    stopPreview()
+  }
 
   const shouldAssignColour = () => {
     const randomNumber = Math.floor(Math.random() * 10);
@@ -87,7 +104,7 @@ const Grid = () => {
 
   return (
     <>
-    <ConnectWallet></ConnectWallet>
+    <ConnectWallet onConnect={handleConnect}></ConnectWallet>
       <Container height={GRID_HEIGHT} width={GRID_WIDTH}>
         {numbers}
       </Container>
