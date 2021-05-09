@@ -13,7 +13,7 @@ const Row = styled.div`
 `;
 
 interface ContainerProps {
-       height: number;
+  height: number;
   width: number;
 }
 
@@ -25,6 +25,7 @@ const Container = styled.div<ContainerProps>`
 
 const Grid = () => {
   const [colours, setColours] = useState<string[][]>([]);
+  const [intervalRef, setIntervalRef] = useState<NodeJS.Timeout>();
 
   useEffect(() => {
     window.scrollTo(
@@ -34,11 +35,20 @@ const Grid = () => {
 
     setColours(generateGrid());
 
-    setInterval(() => {
+    const ref = setInterval(() => {
       const coloursGrid: string[][] = generateGrid();
       setColours(coloursGrid);
-    }, 10000);
+    }, 1000);
+    setIntervalRef(ref);
+    
+    stopPreview(); // should be called when user connects wallet
   }, []);
+
+  const stopPreview = () => {
+    if (intervalRef) {
+      clearInterval(intervalRef);
+    }
+  };
 
   const generateGrid = () => {
     return Array(ROWS)

@@ -15,7 +15,7 @@ const StyledPixel = styled.div.attrs<StyledPixelProps>((props) => ({
   display: flex;
   align-items: center;
   justify-content: center;
-
+  margin: 1px;
   flex-shrink: 0;
 `;
 
