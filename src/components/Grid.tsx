@@ -29,6 +29,12 @@ interface ColorPickerProps {
   left: number | undefined;
   top: number | undefined;
 }
+
+interface PixelPosition {
+  rowIndex: number;
+  colIndex: number;
+}
+
 const ColorPickerContainer = styled.div<ColorPickerProps>`
   position: absolute;
   left: ${(props) => props.left + "px"};
@@ -40,6 +46,7 @@ const Grid = () => {
   const [intervalRef, setIntervalRef] = useState<NodeJS.Timeout>();
   const [color, setColor] = useState("#000000");
   const [showColorPicker, setShowColorPicker] = useState(false);
+  const [pixelPosition, setPixelPosition] = useState<PixelPosition>();
   const [colorPickerProps, setColorPickerProps] = useState<ColorPickerProps>();
   const colorPickerRef = useRef<HTMLDivElement>(null);
 
@@ -54,11 +61,9 @@ const Grid = () => {
     const ref = setInterval(() => {
       const coloursGrid: string[][] = generateGrid();
       setColours(coloursGrid);
-    }, 10000);
+    }, 3000);
     setIntervalRef(ref);
-
-    stopPreview(); // should be called when user connects wallet
-  }, []);
+  },[]);
 
   useEffect(() => {
     const handleClickOutside = (event: any) => {
@@ -108,14 +113,28 @@ const Grid = () => {
     stopPreview();
   };
 
-  const handlePixelClick = (details: any, row:number, col:number) => {
-    console.log(details);
+  const handlePixelClick = (
+    details: any,
+    rowIndex: number,
+    colIndex: number
+  ) => {
     setColorPickerProps({
       left: details.xPos + window.scrollX + PIXEL_SIZE,
       top: details.yPos + window.scrollY + PIXEL_SIZE,
     });
 
+    setPixelPosition({ rowIndex: rowIndex, colIndex: colIndex });
+
     setShowColorPicker(true);
+  };
+
+  const handleColorChange = (color: string) => {
+    setColor(color);
+    const currentColors = colours;
+    if (pixelPosition) {
+      currentColors[pixelPosition.rowIndex][pixelPosition.colIndex] = color
+    }
+    setColours(currentColors);
   };
 
   const shouldAssignColour = () => {
@@ -135,7 +154,7 @@ const Grid = () => {
           colour={colour}
           pixelSize={PIXEL_SIZE}
           key={`${rowIndex}_${colIndex}`}
-          onClick={(a:any)=>handlePixelClick(a, rowIndex, colIndex)}
+          onClick={(a: any) => handlePixelClick(a, rowIndex, colIndex)}
         ></Pixel>
       ))}
     </Row>
@@ -149,7 +168,7 @@ const Grid = () => {
           top={colorPickerProps?.top}
           ref={colorPickerRef}
         >
-          <HexColorPicker color={color} onChange={setColor} />;
+          <HexColorPicker color={color} onChange={handleColorChange} />;
         </ColorPickerContainer>
       ) : (
         <></>
