@@ -17,6 +17,7 @@ const StyledPixel = styled.div.attrs<StyledPixelProps>((props) => ({
   justify-content: center;
   margin: 1px;
   flex-shrink: 0;
+  cursor: pointer;
 `;
 
 const Pixel = (props: { colour: string; pixelSize:number }) => {

@@ -2,6 +2,8 @@ import Pixel from "./Pixel";
 import styled from "styled-components";
 import { useEffect, useState } from "react";
 import ConnectWallet from "./ConnectWallet";
+import { HexColorPicker } from "react-colorful";
+
 
 const COLS = 40;
 const ROWS = 40;
@@ -27,6 +29,7 @@ const Container = styled.div<ContainerProps>`
 const Grid = () => {
   const [colours, setColours] = useState<string[][]>([]);
   const [intervalRef, setIntervalRef] = useState<NodeJS.Timeout>();
+  const [color, setColor] = useState("#000000");
 
   useEffect(() => {
     window.scrollTo(
@@ -104,6 +107,7 @@ const Grid = () => {
 
   return (
     <>
+    <HexColorPicker color={color} onChange={setColor} />;
     <ConnectWallet onConnect={handleConnect}></ConnectWallet>
       <Container height={GRID_HEIGHT} width={GRID_WIDTH}>
         {numbers}
