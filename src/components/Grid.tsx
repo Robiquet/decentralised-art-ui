@@ -1,9 +1,8 @@
 import Pixel from "./Pixel";
 import styled from "styled-components";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ConnectWallet from "./ConnectWallet";
 import { HexColorPicker } from "react-colorful";
-
 
 const COLS = 40;
 const ROWS = 40;
@@ -26,10 +25,23 @@ const Container = styled.div<ContainerProps>`
   overflow: auto;
 `;
 
+interface ColorPickerProps {
+  left: number | undefined;
+  top: number | undefined;
+}
+const ColorPickerContainer = styled.div<ColorPickerProps>`
+  position: absolute;
+  left: ${(props) => props.left + "px"};
+  top: ${(props) => props.top + "px"}; ;
+`;
+
 const Grid = () => {
   const [colours, setColours] = useState<string[][]>([]);
   const [intervalRef, setIntervalRef] = useState<NodeJS.Timeout>();
   const [color, setColor] = useState("#000000");
+  const [showColorPicker, setShowColorPicker] = useState(false);
+  const [colorPickerProps, setColorPickerProps] = useState<ColorPickerProps>();
+  const colorPickerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     window.scrollTo(
@@ -47,6 +59,19 @@ const Grid = () => {
 
     stopPreview(); // should be called when user connects wallet
   }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: any) => {
+      if (colorPickerRef?.current?.contains(event.target) === false) {
+        setShowColorPicker(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [colorPickerRef]);
 
   const stopPreview = () => {
     if (intervalRef) {
@@ -77,11 +102,21 @@ const Grid = () => {
             return "";
           });
       });
-  }
+  };
 
-  const handleConnect=()=> {
-    stopPreview()
-  }
+  const handleConnect = () => {
+    stopPreview();
+  };
+
+  const handlePixelClick = (details: any, row:number, col:number) => {
+    console.log(details);
+    setColorPickerProps({
+      left: details.xPos + window.scrollX + PIXEL_SIZE,
+      top: details.yPos + window.scrollY + PIXEL_SIZE,
+    });
+
+    setShowColorPicker(true);
+  };
 
   const shouldAssignColour = () => {
     const randomNumber = Math.floor(Math.random() * 10);
@@ -100,6 +135,7 @@ const Grid = () => {
           colour={colour}
           pixelSize={PIXEL_SIZE}
           key={`${rowIndex}_${colIndex}`}
+          onClick={(a:any)=>handlePixelClick(a, rowIndex, colIndex)}
         ></Pixel>
       ))}
     </Row>
@@ -107,8 +143,19 @@ const Grid = () => {
 
   return (
     <>
-    <HexColorPicker color={color} onChange={setColor} />;
-    <ConnectWallet onConnect={handleConnect}></ConnectWallet>
+      {showColorPicker ? (
+        <ColorPickerContainer
+          left={colorPickerProps?.left}
+          top={colorPickerProps?.top}
+          ref={colorPickerRef}
+        >
+          <HexColorPicker color={color} onChange={setColor} />;
+        </ColorPickerContainer>
+      ) : (
+        <></>
+      )}
+
+      <ConnectWallet onConnect={handleConnect}></ConnectWallet>
       <Container height={GRID_HEIGHT} width={GRID_WIDTH}>
         {numbers}
       </Container>
