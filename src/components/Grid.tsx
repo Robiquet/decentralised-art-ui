@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import ConnectWallet from "./ConnectWallet";
 import { HexColorPicker } from "react-colorful";
 import Button from "@material-ui/core/Button";
+import { useDebouncedCallback } from "use-debounce";
 
 const COLS = 40;
 const ROWS = 40;
@@ -140,7 +141,7 @@ const Grid = () => {
     setShowColorPicker(true);
   };
 
-  const handleColorChange = (color: string) => {
+  const handleColorChange = useDebouncedCallback((color: string) => {
     setColor(color);
     const currentColors = colours;
     if (pixelPosition) {
@@ -165,7 +166,7 @@ const Grid = () => {
     }
 
     setColours(currentColors);
-  };
+  }, 100);
 
   const shouldAssignColour = () => {
     const randomNumber = Math.floor(Math.random() * 10);
