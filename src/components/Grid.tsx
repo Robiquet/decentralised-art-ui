@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { useEffect, useRef, useState } from "react";
 import ConnectWallet from "./ConnectWallet";
 import { HexColorPicker } from "react-colorful";
+import Button from "@material-ui/core/Button";
 
 const COLS = 40;
 const ROWS = 40;
@@ -25,6 +26,12 @@ const Container = styled.div<ContainerProps>`
   overflow: auto;
 `;
 
+const SaveButton = styled(Button)`
+  position: sticky;
+  left: ${() => window.innerWidth - 80 + "px"};
+  bottom: 10px;
+`;
+
 interface ColorPickerProps {
   left: number | undefined;
   top: number | undefined;
@@ -33,6 +40,10 @@ interface ColorPickerProps {
 interface PixelPosition {
   rowIndex: number;
   colIndex: number;
+}
+
+interface PixelDetails extends PixelPosition {
+  color: string;
 }
 
 const ColorPickerContainer = styled.div<ColorPickerProps>`
@@ -49,6 +60,7 @@ const Grid = () => {
   const [pixelPosition, setPixelPosition] = useState<PixelPosition>();
   const [colorPickerProps, setColorPickerProps] = useState<ColorPickerProps>();
   const colorPickerRef = useRef<HTMLDivElement>(null);
+  const [changedPixels, setChangedPixels] = useState<PixelDetails[]>([]);
 
   useEffect(() => {
     window.scrollTo(
@@ -61,9 +73,9 @@ const Grid = () => {
     const ref = setInterval(() => {
       const coloursGrid: string[][] = generateGrid();
       setColours(coloursGrid);
-    }, 3000);
+    }, 10000);
     setIntervalRef(ref);
-  },[]);
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: any) => {
@@ -132,8 +144,26 @@ const Grid = () => {
     setColor(color);
     const currentColors = colours;
     if (pixelPosition) {
-      currentColors[pixelPosition.rowIndex][pixelPosition.colIndex] = color
+      currentColors[pixelPosition.rowIndex][pixelPosition.colIndex] = color;
+      const pixelIndex = changedPixels.findIndex(
+        (p) =>
+          p.colIndex === pixelPosition.colIndex &&
+          p.rowIndex === pixelPosition.rowIndex
+      );
+
+      //pixel has been modified
+      if (pixelIndex === -1) {
+        setChangedPixels([
+          ...changedPixels,
+          { ...pixelPosition, color: color },
+        ]);
+      } else {
+        const newPixels = [...changedPixels];
+        newPixels[pixelIndex] = { ...pixelPosition, color: color };
+        setChangedPixels(newPixels);
+      }
     }
+
     setColours(currentColors);
   };
 
@@ -145,6 +175,10 @@ const Grid = () => {
   const generateRandomColour = () => {
     var randomColor = "#" + Math.floor(Math.random() * 16777215).toString(16);
     return randomColor;
+  };
+
+  const handleSave = () => {
+    console.log(changedPixels);
   };
 
   const numbers = colours.map((row, rowIndex) => (
@@ -178,6 +212,14 @@ const Grid = () => {
       <Container height={GRID_HEIGHT} width={GRID_WIDTH}>
         {numbers}
       </Container>
+
+      {changedPixels.length > 0 ? (
+        <SaveButton variant="contained" color="primary" onClick={handleSave}>
+          Save
+        </SaveButton>
+      ) : (
+        <></>
+      )}
     </>
   );
 };
