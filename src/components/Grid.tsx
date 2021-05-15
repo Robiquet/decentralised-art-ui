@@ -5,6 +5,8 @@ import ConnectWallet from "./ConnectWallet";
 import { HexColorPicker } from "react-colorful";
 import Button from "@material-ui/core/Button";
 import { useDebouncedCallback } from "use-debounce";
+import IconButton from "@material-ui/core/IconButton";
+import CloseIcon from "@material-ui/icons/Close";
 
 const COLS = 40;
 const ROWS = 40;
@@ -31,6 +33,12 @@ const SaveButton = styled(Button)`
   position: sticky;
   left: ${() => window.innerWidth - 80 + "px"};
   bottom: 10px;
+`;
+
+const CloseButton = styled(IconButton)`
+  position: relative;
+  left: 190px;
+  top: 5px;
 `;
 
 interface ColorPickerProps {
@@ -81,6 +89,7 @@ const Grid = () => {
   useEffect(() => {
     const handleClickOutside = (event: any) => {
       if (colorPickerRef?.current?.contains(event.target) === false) {
+        // this isn't working at the moment because pixel clicks reopen the picker, not sure if we want this behaviour anyway
         setShowColorPicker(false);
       }
     };
@@ -182,6 +191,10 @@ const Grid = () => {
     console.log(changedPixels);
   };
 
+  const handleClose = () => {
+    setShowColorPicker(false);
+  };
+
   const numbers = colours.map((row, rowIndex) => (
     <Row key={rowIndex}>
       {row.map((colour, colIndex) => (
@@ -203,6 +216,13 @@ const Grid = () => {
           top={colorPickerProps?.top}
           ref={colorPickerRef}
         >
+          <CloseButton
+            aria-label="delete"
+            color="primary"
+            onClick={handleClose}
+          >
+            <CloseIcon />
+          </CloseButton>
           <HexColorPicker color={color} onChange={handleColorChange} />;
         </ColorPickerContainer>
       ) : (
