@@ -36,7 +36,6 @@ const StyledPixel = styled.div.attrs<StyledPixelProps>((props) => ({
   &:hover {
   border: 1px white solid;
   box-sizing: border-box;
-
 }
 `;
 

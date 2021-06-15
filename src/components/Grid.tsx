@@ -58,6 +58,7 @@ const Grid = () => {
   const [intervalRef, setIntervalRef] = useState<NodeJS.Timeout>();
   const colorPickerRef = useRef<HTMLDivElement>(null);
   const [changedPixels, setChangedPixels] = useState<PixelDetails[]>([]);
+  const [showPanel, setShowPanel] = useState<boolean>(false)
 
   const colorContext = useContext(ColorContext);
 
@@ -122,6 +123,7 @@ const Grid = () => {
   };
 
   const handleConnect = () => {
+    setShowPanel(true)
     stopPreview();
   };
 
@@ -181,7 +183,8 @@ const Grid = () => {
       <Container height={GRID_HEIGHT} width={GRID_WIDTH}>
         {pixels}
       </Container>
-      <StyledPanel></StyledPanel>
+      {showPanel === true ? <StyledPanel></StyledPanel> : <></>}
+      
     </>
   );
 };
