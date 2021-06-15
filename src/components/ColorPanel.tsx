@@ -28,8 +28,8 @@ const ColorPanel = () => {
   return (
     <>
       {showPanel === true ? (
-        <div className="bg-white w-64 h-72 sticky left-2 bottom-2 rounded flex flex-col items-center justify-around">
-          <button className="ml-auto pr-2">
+        <div className="bg-white w-64 h-72 sticky left-2 bottom-2 rounded flex flex-col items-center">
+          <button className="ml-auto pr-2 pb-2">
             <FontAwesomeIcon
               onClick={handleHidePanelClick}
               className="ml-auto"
@@ -39,7 +39,7 @@ const ColorPanel = () => {
           </button>
           <HexColorPicker color={color} onChange={handleColorChange} />
           {/* <div>{colorContext.color}</div> */}
-          <div className="flex">
+          <div className="flex mt-4">
             <button>
               <FontAwesomeIcon icon="pen" size="lg" />
             </button>
