@@ -41,10 +41,16 @@ const ColorPanel = () => {
           {/* <div>{colorContext.color}</div> */}
           <div className="flex">
             <button>
-              <FontAwesomeIcon icon="pen" size="2x" />
+              <FontAwesomeIcon icon="pen" size="lg" />
             </button>
             <button className="ml-10">
-              <FontAwesomeIcon icon="hand-paper" size="2x" />
+              <FontAwesomeIcon className="text-gray-400" icon="hand-paper" size="lg" />
+            </button>
+            <button className="ml-10">
+              <FontAwesomeIcon className="text-gray-400" icon="eye-dropper" size="lg" />
+            </button>
+            <button className="ml-10">
+              <FontAwesomeIcon className="text-gray-400" icon="save" size="lg" />
             </button>
           </div>
         </div>
