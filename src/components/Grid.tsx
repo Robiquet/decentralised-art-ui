@@ -1,12 +1,10 @@
-import Pixel from "./Pixel";
-import styled from "styled-components";
-import { useEffect, useRef, useState } from "react";
-import ConnectWallet from "./ConnectWallet";
-import { HexColorPicker } from "react-colorful";
-import Button from "@material-ui/core/Button";
-import { useDebouncedCallback } from "use-debounce";
 import IconButton from "@material-ui/core/IconButton";
-import CloseIcon from "@material-ui/icons/Close";
+import { useContext, useEffect, useRef, useState } from "react";
+import styled from "styled-components";
+import ColorContext from "../context/selected-color";
+import ColorPanel from "./ColorPanel";
+import ConnectWallet from "./ConnectWallet";
+import Pixel from "./Pixel";
 
 const COLS = 40;
 const ROWS = 40;
@@ -29,7 +27,7 @@ const Container = styled.div<ContainerProps>`
   overflow: auto;
 `;
 
-const SaveButton = styled(Button)`
+const StyledPanel = styled(ColorPanel)`
   position: sticky;
   left: ${() => window.innerWidth - 80 + "px"};
   bottom: 10px;
@@ -55,21 +53,13 @@ interface PixelDetails extends PixelPosition {
   color: string;
 }
 
-const ColorPickerContainer = styled.div<ColorPickerProps>`
-  position: absolute;
-  left: ${(props) => props.left + "px"};
-  top: ${(props) => props.top + "px"}; ;
-`;
-
 const Grid = () => {
   const [colours, setColours] = useState<string[][]>([]);
   const [intervalRef, setIntervalRef] = useState<NodeJS.Timeout>();
-  const [color, setColor] = useState("#000000");
-  const [showColorPicker, setShowColorPicker] = useState(false);
-  const [pixelPosition, setPixelPosition] = useState<PixelPosition>();
-  const [colorPickerProps, setColorPickerProps] = useState<ColorPickerProps>();
   const colorPickerRef = useRef<HTMLDivElement>(null);
   const [changedPixels, setChangedPixels] = useState<PixelDetails[]>([]);
+
+  const colorContext = useContext(ColorContext);
 
   useEffect(() => {
     window.scrollTo(
@@ -90,7 +80,7 @@ const Grid = () => {
     const handleClickOutside = (event: any) => {
       if (colorPickerRef?.current?.contains(event.target) === false) {
         // this isn't working at the moment because pixel clicks reopen the picker, not sure if we want this behaviour anyway
-        setShowColorPicker(false);
+        // setShowColorPicker(false);
       }
     };
 
@@ -135,47 +125,32 @@ const Grid = () => {
     stopPreview();
   };
 
-  const handlePixelClick = (
-    details: any,
-    rowIndex: number,
-    colIndex: number
-  ) => {
-    setColorPickerProps({
-      left: details.xPos + window.scrollX + PIXEL_SIZE,
-      top: details.yPos + window.scrollY + PIXEL_SIZE,
-    });
-
-    setPixelPosition({ rowIndex: rowIndex, colIndex: colIndex });
-
-    setShowColorPicker(true);
-  };
-
-  const handleColorChange = useDebouncedCallback((color: string) => {
-    setColor(color);
+  const handlePixelClick = (rowIndex: number, colIndex: number) => {
     const currentColors = colours;
-    if (pixelPosition) {
-      currentColors[pixelPosition.rowIndex][pixelPosition.colIndex] = color;
-      const pixelIndex = changedPixels.findIndex(
-        (p) =>
-          p.colIndex === pixelPosition.colIndex &&
-          p.rowIndex === pixelPosition.rowIndex
-      );
 
-      //pixel has been modified
-      if (pixelIndex === -1) {
-        setChangedPixels([
-          ...changedPixels,
-          { ...pixelPosition, color: color },
-        ]);
-      } else {
-        const newPixels = [...changedPixels];
-        newPixels[pixelIndex] = { ...pixelPosition, color: color };
-        setChangedPixels(newPixels);
-      }
+    currentColors[rowIndex][colIndex] = colorContext.color;
+    const pixelIndex = changedPixels.findIndex(
+      (p) => p.colIndex === colIndex && p.rowIndex === rowIndex
+    );
+
+    //pixel has been modified
+    if (pixelIndex === -1) {
+      setChangedPixels([
+        ...changedPixels,
+        { color: colorContext.color, colIndex: colIndex, rowIndex: rowIndex },
+      ]);
+    } else {
+      const newPixels = [...changedPixels];
+      newPixels[pixelIndex] = {
+        color: colorContext.color,
+        colIndex: colIndex,
+        rowIndex: rowIndex,
+      };
+      setChangedPixels(newPixels);
     }
 
     setColours(currentColors);
-  }, 100);
+  };
 
   const shouldAssignColour = () => {
     const randomNumber = Math.floor(Math.random() * 10);
@@ -187,22 +162,14 @@ const Grid = () => {
     return randomColor;
   };
 
-  const handleSave = () => {
-    console.log(changedPixels);
-  };
-
-  const handleClose = () => {
-    setShowColorPicker(false);
-  };
-
-  const numbers = colours.map((row, rowIndex) => (
+  const pixels = colours.map((row, rowIndex) => (
     <Row key={rowIndex}>
       {row.map((colour, colIndex) => (
         <Pixel
           colour={colour}
           pixelSize={PIXEL_SIZE}
           key={`${rowIndex}_${colIndex}`}
-          onClick={(a: any) => handlePixelClick(a, rowIndex, colIndex)}
+          onClick={() => handlePixelClick(rowIndex, colIndex)}
         ></Pixel>
       ))}
     </Row>
@@ -210,37 +177,11 @@ const Grid = () => {
 
   return (
     <>
-      {showColorPicker ? (
-        <ColorPickerContainer
-          left={colorPickerProps?.left}
-          top={colorPickerProps?.top}
-          ref={colorPickerRef}
-        >
-          <CloseButton
-            aria-label="delete"
-            color="primary"
-            onClick={handleClose}
-          >
-            <CloseIcon />
-          </CloseButton>
-          <HexColorPicker color={color} onChange={handleColorChange} />;
-        </ColorPickerContainer>
-      ) : (
-        <></>
-      )}
-
       <ConnectWallet onConnect={handleConnect}></ConnectWallet>
       <Container height={GRID_HEIGHT} width={GRID_WIDTH}>
-        {numbers}
+        {pixels}
       </Container>
-
-      {changedPixels.length > 0 ? (
-        <SaveButton variant="contained" color="primary" onClick={handleSave}>
-          Save
-        </SaveButton>
-      ) : (
-        <></>
-      )}
+      <StyledPanel></StyledPanel>
     </>
   );
 };

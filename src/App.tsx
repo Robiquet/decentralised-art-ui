@@ -3,17 +3,21 @@ import "./App.scss";
 import Grid from "./components/Grid";
 import { StyleSheetManager } from "styled-components";
 import { library } from "@fortawesome/fontawesome-svg-core";
-import {
-  faHandPaper,
-  faPen
-} from "@fortawesome/free-solid-svg-icons";
+import { faHandPaper, faPen } from "@fortawesome/free-solid-svg-icons";
+import ColorContext from "./context/selected-color";
 
 library.add(faHandPaper, faPen);
 
 function App() {
   return (
     <StyleSheetManager disableVendorPrefixes>
-      <Grid></Grid>
+      <ColorContext.Provider
+        value={{
+          color: "#000000",
+        }}
+      >
+        <Grid></Grid>
+      </ColorContext.Provider>
     </StyleSheetManager>
   );
 }
