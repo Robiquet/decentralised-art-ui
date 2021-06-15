@@ -3,10 +3,10 @@ import "./App.scss";
 import Grid from "./components/Grid";
 import { StyleSheetManager } from "styled-components";
 import { library } from "@fortawesome/fontawesome-svg-core";
-import { faHandPaper, faPen } from "@fortawesome/free-solid-svg-icons";
+import { faHandPaper, faPen, faCompressAlt } from "@fortawesome/free-solid-svg-icons";
 import ColorContext from "./context/selected-color";
 
-library.add(faHandPaper, faPen);
+library.add(faHandPaper, faPen, faCompressAlt);
 
 function App() {
   return (
