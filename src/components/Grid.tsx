@@ -5,16 +5,13 @@ import ColorContext from "../context/selected-color";
 import ColorPanel from "./ColorPanel";
 import ConnectWallet from "./ConnectWallet";
 import Pixel from "./Pixel";
+import PixelCanvas from "./PixelCanvas";
 
 const COLS = 40;
 const ROWS = 40;
 const PIXEL_SIZE = 50;
 const GRID_HEIGHT = ROWS * PIXEL_SIZE;
 const GRID_WIDTH = COLS * PIXEL_SIZE;
-
-const Row = styled.div`
-  display: flex;
-`;
 
 interface ContainerProps {
   height: number;
@@ -32,18 +29,6 @@ const StyledPanel = styled(ColorPanel)`
   left: ${() => window.innerWidth - 80 + "px"};
   bottom: 10px;
 `;
-
-const CloseButton = styled(IconButton)`
-  position: relative;
-  left: 190px;
-  top: 5px;
-`;
-
-interface ColorPickerProps {
-  left: number | undefined;
-  top: number | undefined;
-}
-
 interface PixelPosition {
   rowIndex: number;
   colIndex: number;
@@ -56,7 +41,6 @@ interface PixelDetails extends PixelPosition {
 const Grid = () => {
   const [colours, setColours] = useState<string[][]>([]);
   const [intervalRef, setIntervalRef] = useState<NodeJS.Timeout>();
-  const colorPickerRef = useRef<HTMLDivElement>(null);
   const [changedPixels, setChangedPixels] = useState<PixelDetails[]>([]);
   const [showPanel, setShowPanel] = useState<boolean>(false)
 
@@ -76,20 +60,6 @@ const Grid = () => {
     }, 10000);
     setIntervalRef(ref);
   }, []);
-
-  useEffect(() => {
-    const handleClickOutside = (event: any) => {
-      if (colorPickerRef?.current?.contains(event.target) === false) {
-        // this isn't working at the moment because pixel clicks reopen the picker, not sure if we want this behaviour anyway
-        // setShowColorPicker(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [colorPickerRef]);
 
   const stopPreview = () => {
     if (intervalRef) {
@@ -164,24 +134,12 @@ const Grid = () => {
     return randomColor;
   };
 
-  const pixels = colours.map((row, rowIndex) => (
-    <Row key={rowIndex}>
-      {row.map((colour, colIndex) => (
-        <Pixel
-          colour={colour}
-          pixelSize={PIXEL_SIZE}
-          key={`${rowIndex}_${colIndex}`}
-          onClick={() => handlePixelClick(rowIndex, colIndex)}
-        ></Pixel>
-      ))}
-    </Row>
-  ));
 
   return (
     <>
       <ConnectWallet onConnect={handleConnect}></ConnectWallet>
       <Container height={GRID_HEIGHT} width={GRID_WIDTH}>
-        {pixels}
+        <PixelCanvas pixelSize={PIXEL_SIZE} colours={colours} onPixelClick={(rowIndex, colIndex) => handlePixelClick(rowIndex, colIndex)}></PixelCanvas>
       </Container>
       {showPanel === true ? <StyledPanel></StyledPanel> : <></>}
       
