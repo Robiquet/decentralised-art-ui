@@ -1,3 +1,4 @@
+import { memo } from "react";
 import styled from "styled-components";
 import Pixel from "./Pixel";
 
@@ -36,4 +37,4 @@ const PixelCanvas = ({
   return <>{pixels}</>;
 };
 
-export default PixelCanvas;
+export default memo(PixelCanvas);

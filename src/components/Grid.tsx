@@ -1,10 +1,8 @@
-import IconButton from "@material-ui/core/IconButton";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import styled from "styled-components";
 import ColorContext from "../context/selected-color";
 import ColorPanel from "./ColorPanel";
 import ConnectWallet from "./ConnectWallet";
-import Pixel from "./Pixel";
 import PixelCanvas from "./PixelCanvas";
 
 const COLS = 40;
@@ -18,6 +16,15 @@ interface ContainerProps {
   width: number;
 }
 
+interface PixelPosition {
+  rowIndex: number;
+  colIndex: number;
+}
+
+interface PixelDetails extends PixelPosition {
+  color: string;
+}
+
 const Container = styled.div<ContainerProps>`
   height: ${(props) => props.height};
   width: ${(props) => props.width};
@@ -29,14 +36,7 @@ const StyledPanel = styled(ColorPanel)`
   left: ${() => window.innerWidth - 80 + "px"};
   bottom: 10px;
 `;
-interface PixelPosition {
-  rowIndex: number;
-  colIndex: number;
-}
 
-interface PixelDetails extends PixelPosition {
-  color: string;
-}
 
 const Grid = () => {
   const [colours, setColours] = useState<string[][]>([]);
@@ -97,7 +97,7 @@ const Grid = () => {
     stopPreview();
   };
 
-  const handlePixelClick = (rowIndex: number, colIndex: number) => {
+  const handlePixelClick = useCallback((rowIndex: number, colIndex: number) => {
     const currentColors = colours;
 
     currentColors[rowIndex][colIndex] = colorContext.color;
@@ -122,8 +122,9 @@ const Grid = () => {
     }
 
     setColours(currentColors);
-  };
+  },[changedPixels,colorContext.color, colours]);
 
+  
   const shouldAssignColour = () => {
     const randomNumber = Math.floor(Math.random() * 10);
     return randomNumber === 5;
@@ -139,7 +140,7 @@ const Grid = () => {
     <>
       <ConnectWallet onConnect={handleConnect}></ConnectWallet>
       <Container height={GRID_HEIGHT} width={GRID_WIDTH}>
-        <PixelCanvas pixelSize={PIXEL_SIZE} colours={colours} onPixelClick={(rowIndex, colIndex) => handlePixelClick(rowIndex, colIndex)}></PixelCanvas>
+        <PixelCanvas pixelSize={PIXEL_SIZE} colours={colours} onPixelClick={handlePixelClick}></PixelCanvas>
       </Container>
       {showPanel === true ? <StyledPanel></StyledPanel> : <></>}
       

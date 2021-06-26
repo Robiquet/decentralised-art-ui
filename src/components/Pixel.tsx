@@ -1,7 +1,5 @@
+import { memo, useRef } from "react";
 import styled from "styled-components";
-import ReactDOM from "react-dom";
-import { useRef } from "react";
-import { isConstructorDeclaration } from "typescript";
 
 interface StyledPixelProps {
   backgroundColour: string;
@@ -63,4 +61,4 @@ const Pixel = (props: PixelProps) => {
   );
 };
 
-export default Pixel;
+export default memo(Pixel);
