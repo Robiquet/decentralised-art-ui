@@ -9,14 +9,7 @@ interface StyledPixelProps {
 interface PixelProps {
   colour: string;
   pixelSize: number;
-  onClick: Function
-}
-
-interface PixelPosition {
-  xPos: number;
-  yPos: number;
-  width: number;
-  height: number;
+  onClick: () => void
 }
 
 const StyledPixel = styled.div.attrs<StyledPixelProps>((props) => ({
@@ -41,14 +34,7 @@ const Pixel = (props: PixelProps) => {
   const el = useRef<HTMLDivElement>(null);
 
   const handleClick = () => {
-    const rect = el?.current?.getBoundingClientRect();
-    const pixelPosition = {
-      xPos: rect?.x,
-      yPos: rect?.y,
-      width: rect?.x,
-      height: rect?.x
-    }
-    props.onClick(pixelPosition)
+    props.onClick()
   };
 
   return (
