@@ -1,4 +1,10 @@
-import { useCallback, useContext, useEffect, useState } from "react";
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useReducer,
+  useState,
+} from "react";
 import styled from "styled-components";
 import ColorContext from "../context/selected-color";
 import ColorPanel from "./ColorPanel";
@@ -37,12 +43,77 @@ const StyledPanel = styled(ColorPanel)`
   bottom: 10px;
 `;
 
+interface ColourState {
+  changedPixels: PixelDetails[];
+  colours: string[][];
+}
+
+interface ColourAction {
+  colour: string;
+  rowIndex: number;
+  colIndex: number;
+}
+
+const colourInitialiser = () => {
+  return {
+    changedPixels: [],
+    colours: Array(ROWS)
+      .fill(0)
+      .map(() => {
+        return Array(COLS)
+          .fill(0)
+          .map(() => {
+            return "";
+          });
+      }),
+  };
+};
+
+const colourReducer = (state: ColourState, action: ColourAction) => {
+  const currentColors = state.colours;
+  const newChangedPixels: PixelDetails[] = state.changedPixels;
+
+  const { colour, rowIndex, colIndex } = action;
+
+  currentColors[rowIndex][colIndex] = colour;
+  const pixelIndex = state.changedPixels.findIndex(
+    (p) => p.colIndex === colIndex && p.rowIndex === rowIndex
+  );
+
+  //pixel has been modified
+  if (pixelIndex === -1) {
+    newChangedPixels.push({
+      color: colour,
+      colIndex: colIndex,
+      rowIndex: rowIndex,
+    });
+  } else {
+    newChangedPixels[pixelIndex] = {
+      color: colour,
+      colIndex: colIndex,
+      rowIndex: rowIndex,
+    };
+  }
+
+  console.log(currentColors)
+  return { changedPixels: newChangedPixels, colours: currentColors };
+};
 
 const Grid = () => {
-  const [colours, setColours] = useState<string[][]>([]);
+  const [previewColours, setPreviewColours] = useState<string[][]>([]);
   const [intervalRef, setIntervalRef] = useState<NodeJS.Timeout>();
-  const [changedPixels, setChangedPixels] = useState<PixelDetails[]>([]);
-  const [showPanel, setShowPanel] = useState<boolean>(false)
+  const [showPanel, setShowPanel] = useState<boolean>(false);
+  const [state, dispatch] = useReducer<
+    (state: ColourState, action: ColourAction) => ColourState,
+    ColourState
+  >(
+    colourReducer,
+    {
+      changedPixels: [],
+      colours: [],
+    },
+    colourInitialiser
+  );
 
   const colorContext = useContext(ColorContext);
 
@@ -52,11 +123,11 @@ const Grid = () => {
       GRID_HEIGHT / 2 - window.innerHeight / 2
     );
 
-    setColours(generateGrid());
+    setPreviewColours(generateGrid());
 
     const ref = setInterval(() => {
       const coloursGrid: string[][] = generateGrid();
-      setColours(coloursGrid);
+      setPreviewColours(coloursGrid);
     }, 10000);
     setIntervalRef(ref);
   }, []);
@@ -64,7 +135,6 @@ const Grid = () => {
   const stopPreview = () => {
     if (intervalRef) {
       clearInterval(intervalRef);
-      setColours(generateEmptyGrid());
     }
   };
 
@@ -80,51 +150,22 @@ const Grid = () => {
       });
   };
 
-  const generateEmptyGrid = () => {
-    return Array(ROWS)
-      .fill(0)
-      .map(() => {
-        return Array(COLS)
-          .fill(0)
-          .map(() => {
-            return "";
-          });
-      });
-  };
-
   const handleConnect = () => {
-    setShowPanel(true)
+    setShowPanel(true);
     stopPreview();
   };
 
-  const handlePixelClick = useCallback((rowIndex: number, colIndex: number) => {
-    const currentColors = colours;
-
-    currentColors[rowIndex][colIndex] = colorContext.color;
-    const pixelIndex = changedPixels.findIndex(
-      (p) => p.colIndex === colIndex && p.rowIndex === rowIndex
-    );
-
-    //pixel has been modified
-    if (pixelIndex === -1) {
-      setChangedPixels([
-        ...changedPixels,
-        { color: colorContext.color, colIndex: colIndex, rowIndex: rowIndex },
-      ]);
-    } else {
-      const newPixels = [...changedPixels];
-      newPixels[pixelIndex] = {
-        color: colorContext.color,
-        colIndex: colIndex,
+  const handlePixelClick = useCallback(
+    (rowIndex: number, colIndex: number) => {
+      dispatch({
+        colour: colorContext.color,
         rowIndex: rowIndex,
-      };
-      setChangedPixels(newPixels);
-    }
+        colIndex: colIndex,
+      });
+    },
+    [colorContext.color]
+  );
 
-    setColours(currentColors);
-  },[changedPixels,colorContext.color, colours]);
-
-  
   const shouldAssignColour = () => {
     const randomNumber = Math.floor(Math.random() * 10);
     return randomNumber === 5;
@@ -135,15 +176,24 @@ const Grid = () => {
     return randomColor;
   };
 
-
   return (
     <>
       <ConnectWallet onConnect={handleConnect}></ConnectWallet>
       <Container height={GRID_HEIGHT} width={GRID_WIDTH}>
-        <PixelCanvas pixelSize={PIXEL_SIZE} colours={colours} onPixelClick={handlePixelClick}></PixelCanvas>
+        {showPanel === true ? (
+          <PixelCanvas
+            pixelSize={PIXEL_SIZE}
+            colours={state.colours}
+            onPixelClick={handlePixelClick}
+          ></PixelCanvas>
+        ) : (
+          <PixelCanvas
+            pixelSize={PIXEL_SIZE}
+            colours={previewColours}
+          ></PixelCanvas>
+        )}
       </Container>
       {showPanel === true ? <StyledPanel></StyledPanel> : <></>}
-      
     </>
   );
 };

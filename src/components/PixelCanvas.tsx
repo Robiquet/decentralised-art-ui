@@ -1,4 +1,3 @@
-import { memo } from "react";
 import styled from "styled-components";
 import Pixel from "./Pixel";
 
@@ -9,15 +8,14 @@ const Row = styled.div`
 const PixelCanvas = ({
   colours,
   pixelSize,
-  onPixelClick
+  onPixelClick,
 }: {
   colours: string[][];
   pixelSize: number;
-  onPixelClick: (rowIndex:number,colIndex:number)=>void
+  onPixelClick?: (rowIndex: number, colIndex: number) => void;
 }) => {
-
-  const handlePixelClick = (rowIndex:number,colIndex:number) => {
-    onPixelClick(rowIndex,colIndex)
+  const handlePixelClick = (rowIndex: number, colIndex: number) => {
+    if (onPixelClick) onPixelClick(rowIndex, colIndex);
   };
 
   const pixels = colours.map((row, rowIndex) => (
@@ -28,7 +26,6 @@ const PixelCanvas = ({
           pixelSize={pixelSize}
           key={`${rowIndex}_${colIndex}`}
           onClick={() => handlePixelClick(rowIndex, colIndex)}
-
         ></Pixel>
       ))}
     </Row>
@@ -37,4 +34,4 @@ const PixelCanvas = ({
   return <>{pixels}</>;
 };
 
-export default memo(PixelCanvas);
+export default PixelCanvas;
