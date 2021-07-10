@@ -9,7 +9,9 @@ interface StyledPixelProps {
 interface PixelProps {
   colour: string;
   pixelSize: number;
-  onClick: () => void
+  colIndex: number;
+  rowIndex: number;
+  onClick: (rowIndex: number, colIndex: number) => void;
 }
 
 const StyledPixel = styled.div.attrs<StyledPixelProps>((props) => ({
@@ -25,16 +27,16 @@ const StyledPixel = styled.div.attrs<StyledPixelProps>((props) => ({
   flex-shrink: 0;
   cursor: pointer;
   &:hover {
-  border: 1px white solid;
-  box-sizing: border-box;
-}
+    border: 1px white solid;
+    box-sizing: border-box;
+  }
 `;
 
 const Pixel = (props: PixelProps) => {
   const el = useRef<HTMLDivElement>(null);
 
   const handleClick = () => {
-    props.onClick()
+    props.onClick(props.rowIndex, props.colIndex);
   };
 
   return (

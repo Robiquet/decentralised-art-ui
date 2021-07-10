@@ -95,7 +95,6 @@ const colourReducer = (state: ColourState, action: ColourAction) => {
     };
   }
 
-  console.log(currentColors)
   return { changedPixels: newChangedPixels, colours: currentColors };
 };
 

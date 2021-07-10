@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import styled from "styled-components";
 import Pixel from "./Pixel";
 
@@ -14,9 +15,9 @@ const PixelCanvas = ({
   pixelSize: number;
   onPixelClick?: (rowIndex: number, colIndex: number) => void;
 }) => {
-  const handlePixelClick = (rowIndex: number, colIndex: number) => {
+  const handlePixelClick = useCallback((rowIndex: number, colIndex: number) => {
     if (onPixelClick) onPixelClick(rowIndex, colIndex);
-  };
+  }, [onPixelClick]);
 
   const pixels = colours.map((row, rowIndex) => (
     <Row key={rowIndex}>
@@ -24,8 +25,10 @@ const PixelCanvas = ({
         <Pixel
           colour={colour}
           pixelSize={pixelSize}
+          rowIndex={rowIndex}
+          colIndex={colIndex}
           key={`${rowIndex}_${colIndex}`}
-          onClick={() => handlePixelClick(rowIndex, colIndex)}
+          onClick={handlePixelClick}
         ></Pixel>
       ))}
     </Row>
